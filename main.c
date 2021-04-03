@@ -89,14 +89,26 @@ void	destroy_env(t_env *env)
 
 void	ft_error(t_env *env, char *str)
 {
-	destroy_env(env);
+	if (env)
+		destroy_env(env);
 	write(1, str, ft_strlen(str));
 	write(1, "\n", 1);
+	exit(1);
 }
 
 /////////////////////////////////////
 //              UTILS              //
 /////////////////////////////////////
+
+// Print one elem and go to next. To shorten print_lists().
+/*void	print_elem(t_list *list, int i)
+{
+	if (i < env->a_list->size)
+	{
+		ft_putnbr_fd(env->a_list->current->value, 1);
+		env->a_list->current = env->a_list->current->next;
+	}
+}*/
 
 void	print_lists(t_env *env)
 {
@@ -121,6 +133,7 @@ void	print_lists(t_env *env)
 		write(1, "\n", 1);
 		i++;
 	}
+	write(1, "\n", 1);
 }
 
 //////////////////////////////////////
@@ -138,7 +151,7 @@ t_elem	*create_elem()
 	return (elem);
 }
 
-void	set_elem(t_elem *elem, int nb, void *addr1, void *addr2)
+void	set_elem(t_elem *elem, int nb, t_elem *addr1, t_elem *addr2)
 {
 	elem->value = nb;
 	elem->next = addr1;
@@ -220,17 +233,176 @@ void	*create_env()
     return (env);
 }
 
+//////////////////////////////////////
+//          INSTRUCTIONS            //
+//////////////////////////////////////
+
+void	swap(t_list *list)
+{
+	int tmp;
+
+	tmp = list->first->value;
+	list->first->value = list->first->next->value;
+	list->first->next->value = tmp;
+}
+
+void	roll(t_list *list, int dir)
+{
+	if (dir > 0)
+	{
+		list->first = list->first->next;
+		list->last = list->last->next;
+	}
+	else
+	{
+		list->first = list->first->prev;
+		list->last = list->last->prev;
+	}
+}
+
+void	push(t_list *dest, t_list *src)
+{
+	t_elem *tmp;
+	if (src->size >= 1)
+	{
+//		printf("%p\n%p\n--------------\n", src->first, src->first->next);
+		tmp = src->first->next;
+//		printf("%p\n%p\n%p\n%p\n--------------\n", tmp, src->first, src->first->next, src->first->prev);
+		src->last->next = tmp;
+//		printf("%p\n%p\n%p\n%p\n--------------\n", tmp, src->first, src->first->next, src->first->prev);
+		src->first->next = dest->first;
+//		printf("%p\n%p\n%p\n%p\n--------------\n", tmp, src->first, src->first->next, src->first->prev);
+		src->first->prev = dest->last;
+//		printf("%p\n%p\n%p\n%p\n--------------\n", tmp, src->first, src->first->next, src->first->prev);
+////		src->last->next = tmp;
+////		printf("%p\n%p\n%p\n%p\n--------------\n", tmp, src->first, src->first->next, src->first->prev);
+		tmp->prev = src->last;
+//		printf("%p\n%p\n--------------\n", tmp->prev, src->last);
+		dest->first = src->first;
+//		printf("%p\n%p\n--------------\n", dest->first, src->first);
+		src->first = tmp;
+//		printf("%p\n--------------\n", dest->last);
+		src->size--;
+		dest->size++;
+		if (!dest->last)
+			dest->last = dest->first;
+		dest->last->next = dest->first;
+		if (dest->size <= 2)
+			dest->last->prev = dest->first;
+		
+	}
+}
+
+void	sa(t_env *env)
+{
+	swap(env->a_list);
+	write(1, "sa \n", 4);
+	print_lists(env);
+}
+
+void	sb(t_env *env)
+{
+	swap(env->b_list);
+	write(1, "sb \n", 4);
+	print_lists(env);
+}
+
+void	ra(t_env *env)
+{
+	roll(env->a_list, 1);
+	write(1, "ra \n", 4);
+	print_lists(env);
+}
+
+void	rb(t_env *env)
+{
+	roll(env->b_list, 1);
+	write(1, "rb \n", 4);
+	print_lists(env);
+}
+
+void	rr(t_env *env)
+{
+	roll(env->a_list, 1);
+	roll(env->b_list, 1);
+	write(1, "rr \n", 4);
+	print_lists(env);
+}
+
+void	rra(t_env *env)
+{
+	roll(env->a_list, -1);
+	write(1, "rra \n", 5);
+	print_lists(env);
+}
+
+void	rrb(t_env *env)
+{
+	roll(env->b_list, -1);
+	write(1, "rrb \n", 5);
+	print_lists(env);
+}
+
+void	rrr(t_env *env)
+{
+	roll(env->a_list, -1);
+	roll(env->b_list, -1);
+	write(1, "rrr \n", 5);
+	print_lists(env);
+}
+
+void	pa(t_env *env)
+{
+	push(env->a_list, env->b_list);
+	write(1, "pa \n", 4);
+	print_lists(env);
+}
+
+void	pb(t_env *env)
+{
+	push(env->b_list, env->a_list);
+	write(1, "pb \n", 4);
+	print_lists(env);
+}
+
+//////////////////////////////////////
+//        SORTING ALGORITHM         //
+//////////////////////////////////////
+
+void	sort_list(t_env *env)
+{
+	rra(env);
+	sa(env);
+	rra(env);
+	rra(env);
+	pb(env);
+	pb(env);
+	rra(env);
+	rra(env);
+	pa(env);
+	pa(env);
+	rra(env);
+}
+
+//////////////////////////////////////
+//              MAIN                //
+//////////////////////////////////////
+
 int main(int argc, char **argv)
 {
 	t_env	*env;
 
-	env = create_env();
-	if (parse_args(argc, argv, env) != 0)
-		ft_error(env, "error message to be provided"); // can use parse_args() return value with some error message array.
+	if (!(env = create_env()))
+		ft_error(env, "error");
+	if (parse_args(argc, argv, env) != 0)				// can use an integer to get return value.
+		ft_error(env, "error"); // can use parse_args() return value with some error message array.
 	else
 	{
 		make_lists(env);
+		sort_list(env);
+		write(1, "result : \n", 10);
 		print_lists(env);
+//		printf("%p\n%p\n%p\n%p\n%p\n%p\n", env->a_list->first, env->a_list->first->next, env->a_list->first->next->next, env->a_list->first->next->next->next, env->a_list->first->next->next->next->next, env->a_list->first->next->next->next->next->next);
 		destroy_env(env);
 	}
 
