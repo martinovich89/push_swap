@@ -260,7 +260,7 @@ void	roll(t_list *list, int dir)
 	}
 }
 
-void	push(t_list *dest, t_list *src)
+/*void	push(t_list *dest, t_list *src)
 {
 	t_elem *tmp;
 	if (src->size >= 1)
@@ -291,6 +291,35 @@ void	push(t_list *dest, t_list *src)
 			dest->last->prev = dest->first;
 		
 	}
+}*/
+
+void    push(t_list *dest, t_list *src)
+{
+    t_elem *tmp;
+    if (src->size >= 1)
+    {
+        tmp = src->first;
+        src->last->next = tmp->next;
+        tmp->next->prev = src->last;
+        src->first = tmp->next;
+        tmp->next = dest->first;
+        if(dest->first)
+            dest->first->prev = tmp;
+        tmp->prev = dest->last;
+        if(dest->last)
+        	dest->last->next = tmp;
+        dest->first = tmp;
+        src->size--;
+        dest->size++;
+        if (!dest->last)
+		{ 
+            dest->last = dest->first;
+            dest->last->prev = dest->first;
+            dest->last->next = dest->first;
+            dest->first->prev = dest->first;
+            dest->first->next = dest->first;
+        }
+    }
 }
 
 void	sa(t_env *env)
