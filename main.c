@@ -33,6 +33,7 @@ typedef struct	s_list
 	int		min;			//current list min
 	int		max;			//current list max
 	int		streak;
+	int		dir;
 	int		unsorted;
 	t_elem	*start;
 	t_elem	*first;
@@ -493,7 +494,7 @@ int		is_sorted_list(t_env *env, t_list *list)
 
 	list->cur = list->first;
 	i = 0;
-	while (i < env->total_numbers && (is_sorted(list->cur, list->cur->next) || list->cur->value == env->max && list->cur->next->value == env->min))
+	while (i < env->total_numbers && (is_sorted(list->cur, list->cur->next) || (list->cur->value == env->max && list->cur->next->value == env->min)))
 	{
 		list->cur = list->cur->next;
 		i++;
@@ -502,7 +503,7 @@ int		is_sorted_list(t_env *env, t_list *list)
 }
 
 // Parcourt la chaine jusqu'a trouver une discontinuite dans l'ordre. Retourne le nombre de valeurs ordonnees. Positif si dans l'ordre, Negatif si inverse.
-int		set_streak(t_list *list, t_elem *start)
+/*int		set_streak(t_list *list, t_elem *start)
 {
 	int i;
 	int j;
@@ -516,13 +517,66 @@ int		set_streak(t_list *list, t_elem *start)
 		i++;
 	}
 	list->cur = start;
-	while (j < list->size
+	while (j > (list->size * -1)
 	&& !is_sorted(list->cur->next, list->cur)) // && (list->cur->next->value <= list->cur->value || (list->cur->value == list->min && list->cur->next->value == list->max)))
 	{
 		list->cur = list->cur->next;
 		j--;
 	}
 	return (i + j);
+}*/
+
+int		streak_len(t_list *list, t_elem *start)
+{
+	int i;
+
+	i = 0;
+	list->cur = start;
+	while (is_sorted(list->cur, list->cur->next) && i < list->size)
+	{
+		list->cur = list->cur->next;
+		i++;
+	}
+	list->cur = start;
+	while (!is_sorted(list->cur, list->cur->next) && -i < list->size)
+	{
+		list->cur = list->cur->next;
+		i--;
+	}
+	return (i);
+}
+
+int		rev_streak_len(t_list *list, t_elem *start)
+{
+	int i;
+
+	i = 0;
+	list->cur = start;
+	while (is_sorted(list->cur->prev, list->cur) && i < list->size)
+	{
+		list->cur = list->cur->prev;
+		i++;
+	}
+	list->cur = start;
+	while (!is_sorted(list->cur->prev, list->cur) && -i < list->size)
+	{
+		list->cur = list->cur->prev;
+		i--;
+	}
+	return (i);
+}
+
+void	set_streak(t_list *list, t_elem *start, int dir)
+{
+	int i;
+
+	i = 0;
+	list->cur = start;
+	if (dir == 1)
+		i = streak_len(list, start);
+	else if (dir == -1)
+		i = rev_streak_len(list, start);
+	list->streak = i;
 }
 
 void	insert_seq(t_env *env)
@@ -530,58 +584,104 @@ void	insert_seq(t_env *env)
 	int count;
 
 	count = elems_left(env->a_list);
-	env->a_list->streak = set_streak(env->a_list, env->a_list->first);
-	while (count != 0)
-	while (env->b_list->size > 0 && (env->b_list->first->value < env->a_list->first->value || count == 0 || env->a_list->streak == 0))
+	set_streak(env->a_list, env->a_list->first, env->a_list->dir);
+	while (count > 0 && env->b_list->size > 0)
 	{
-		pa(env);
-		count++;
-		env->a_list->streak++;
+		while (env->b_list->size > 0 && (env->b_list->first->value < env->a_list->first->value || count == 0 || env->a_list->streak == 0))
+		{
+			pa(env);
+			count++;
+			env->a_list->streak++;
+		}
+		while (count > 0 && env->a_list->streak > 0 && env->b_list->first->value >= env->a_list->first->value)
+		{
+			ra(env);
+			count--;
+			env->a_list->streak--;
+		}
 	}
-	while (count > 0 && env->a_list->streak > 0 && env->b_list->first->value >= env->a_list->first->value)
-	{
+	while (env->a_list->streak > 0)
 		ra(env);
-		count--;
-		env->a_list->streak--;
-	}
 }
 
 void	reverse_seq(t_env *env)
 {
-	while (env->a_list->streak++ <= 2)
+	while (env->a_list->streak <= 2)
 	{
+		env->a_list->streak++;
 		pb(env);
 		if (env->b_list->size > 1)
-			rb;
+			rb(env);
 	}
 	sa(env);
 	insert_seq(env);
 }
 
+// on se place au debut de la prochaine suite de nombre.
+void	fix_position(t_env *env, t_list *list)
+{
+	int cmp;
+	int cmp_sign;
+
+	set_streak(list, list->first, 1);
+	cmp = list->streak;
+	set_streak(list, list->first, -1);
+	cmp_sign = (cmp < 0) ? -1 : 1;     // on sauvegarde le signe de cmp.
+	cmp = (cmp < 0) ? -cmp : cmp;      // on fait valeur absolue de cmp pour s'en servir comme compteur.
+	if ((cmp_sign > 0 && list->streak > 0) || (cmp_sign < 0 && list->streak < 0))
+	{
+		while (cmp-- >= 0)
+			ra(env);
+	}
+	else
+	{
+		while (cmp-- > 0 && (list->streak > 1 || list->streak < -1))
+			ra(env);
+	}
+
+}
+/*	cmp = (cmp < 0) ? -cmp : cmp;
+	list->streak = (list->streak < 0) ? -list->streak : list->streak;
+	if (list->streak < cmp)
+	{
+		while (--list->streak > 0)
+			rra(env);
+	}
+	else
+	{
+		if (cmp == 1)
+			ra(env);
+		else
+		{
+			while (cmp-- >= 0)
+				ra(env);
+		}
+	}
+}*/
+
 void	sorting_algorithm(t_env *env)
 {
-	get_next_streak(env->a_list);
+	fix_position(env, env->a_list);
 	env->a_list->start = env->a_list->first;
 	env->a_list->cur = env->a_list->start;
-//	env->min_sort_seq = 5;
 	while (!(is_sorted_list(env, env->a_list) == 0)) // true/false inverse. voir plus haut.
 	{
 		while (env->a_list->first->next != env->a_list->start)
 		{
 //			get_next_streak(env->a_list);
-			env->a_list->streak = set_streak(env->a_list, env->a_list->first); // combien d' elements d'affilee sont tries.
+			set_streak(env->a_list, env->a_list->first, env->a_list->dir); // combien d' elements d'affilee sont tries.
 			if (env->a_list->streak >= 4)                                    // si plus de 5 elements sont tries, on passe la sequence.
 				skip_seq(env);
-			else if (env->a_list->streak < 4 && env->a_list->streak > -4)
-				make_seq(env);  // ATTENTION !! Besoin de check si arrive a start !
+////			else if (env->a_list->streak < 4 && env->a_list->streak > -4)
+////				make_seq(env);  // ATTENTION !! Besoin de check si arrive a start !
 //				env->a_list->unsorted = set_unsorted();
+
 			else if (env->a_list->streak <= -4)
 				reverse_seq(env);
 		}
 //		insert_last();
-//		env->min_sort_seq *= 2;
 	}
-	fix_position(env->a_list);
+	fix_position(env, env->a_list);
 }
 
 //////////////////////////////////////
@@ -599,7 +699,9 @@ int main(int argc, char **argv)
 	else
 	{
 		make_lists(env);
-		sort_list(env);
+		get_next_streak(env, env->a_list);
+		printf("%i\n", env->a_list->first->value);
+//		sort_list(env);
 		write(1, "result : \n", 10);
 		print_lists(env);
 		destroy_env(env);
@@ -607,3 +709,21 @@ int main(int argc, char **argv)
 
 	return (0);
 }
+
+///////////////////////////////////////
+//           NEW ALGORITHM           //
+///////////////////////////////////////
+
+
+/*void	atob(t_env *env)
+{
+	while (env->a_list->first->value > env->b_list->last->value && streak > 0)
+	{
+
+	}
+}
+
+void	btoa(t_env *env)
+{
+	
+}*/

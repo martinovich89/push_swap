@@ -101,3 +101,13 @@ Intrus -> insta-push
 TRI INVERSE :
 
 Si une suite de nombres est classee en sens inverse, il suffit de push, reverse-roll, push, reverse-roll etc
+
+
+--------------------------------------------------
+
+TRI ONE-AGAIN-A-BISTOUFLY
+
+tri cells de 5 elems.
+Puis merge les cells 2 a 2 dans b (moins de push).
+Puis merge les cells 2 a 2 dans a.
+repeter jusqu'a ce que tout soit classe.
