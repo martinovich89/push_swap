@@ -594,14 +594,16 @@ int		count_cells(t_list *list)
 		return (0);
 	get_next_streak(list);
 	tmp = list->cur;
-	count++;
 	list->cur = list->cur->next;
 	while (list->cur != tmp)
 	{
+		if (count != 0)
+			list->cur = list->cur->next;
 		get_next_streak(list);
 		count++;
 		printf("count = %i, tmp = %i, list->cur = %i\n", count, tmp->value, list->cur->value);
 	}
+	count = (count == 0) ? 1 : count;
 	return (count);
 }
 
@@ -900,9 +902,10 @@ int main(int argc, char **argv)
 	{
 		make_lists(env);
 //		make_seq(env);
-		env->a_list->cur = env->a_list->first;
-		get_next_streak(env->a_list);
-		printf("current = %i\n", env->a_list->cur->value);
+//		env->a_list->cur = env->a_list->first;
+//		get_next_streak(env->a_list);
+//		printf("current = %i\n", env->a_list->cur->value);
+		printf("cell_count = %i\n", count_cells(env->a_list));
 //		printf("%i\n", min_streak(env, env->a_list));
 //		fix_position(env, env->a_list, 1);
 //		skip_seq(env, env->a_list, 1);
