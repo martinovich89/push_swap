@@ -544,7 +544,7 @@ int		rev_streak_len(t_list *list, t_elem *start)
 	return (i);
 }
 
-void	set_streak(t_list *list, t_elem *start, int dir)
+int		set_streak(t_list *list, t_elem *start, int dir)
 {
 	int i;
 
@@ -555,19 +555,22 @@ void	set_streak(t_list *list, t_elem *start, int dir)
 	else if (dir == -1)
 		i = rev_streak_len(list, start);
 	list->streak = i;
+	return (i);
 }
 
 void	get_next_streak(t_list *list)
 {
-	int cmp;
-	int cmp_sign;
+	t_elem	*tmp;
+	int		cmp;
+	int		cmp_sign;
 
-	list->cur = list->first;
-	set_streak(list, list->cur, 1);
-	cmp = list->streak;
-	set_streak(list, list->cur, -1);
+	tmp = list->cur;  // Utilisation de tmp pour save current avant set_streak().
+	cmp = set_streak(list, tmp, 1);
+	set_streak(list, tmp, -1);
 	cmp_sign = cmp;
 	cmp = (cmp < 0) ? -cmp : cmp;
+	list->cur = tmp;
+	printf("cmp = %i\n", cmp);
 	if ((cmp_sign > 0 && list->streak > 0) || (cmp_sign < 0 && list->streak < 0))
 	{
 		while (cmp-- >= 0)
@@ -580,12 +583,50 @@ void	get_next_streak(t_list *list)
 	}
 }
 
+int		count_cells(t_list *list)
+{
+	int		count;
+	t_elem	*tmp;
+
+	count = 0;
+	list->cur = list->first;
+	if (list->size == 0)
+		return (0);
+	get_next_streak(list);
+	tmp = list->cur;
+	count++;
+	list->cur = list->cur->next;
+	while (list->cur != tmp)
+	{
+		get_next_streak(list);
+		count++;
+		printf("count = %i, tmp = %i, list->cur = %i\n", count, tmp->value, list->cur->value);
+	}
+	return (count);
+}
+
+// Cette fonction renvoie la permiere serie de moins de 5. Sinon, renvoie la plus petite serie.
 int		min_streak(t_env *env, t_list *list)
 {
+	int size;
+	int count;
+
 	(void)env;
 	list->cur = list->first;
 	get_next_streak(list);
-	return (0);
+	count = set_streak(list, list->cur, 1) + 1;
+	size = count_cells(list);
+	printf("%i\n", size);
+	while (size > 0 && count >= 5)
+	{
+		list->cur = list->cur->next;
+		set_streak(list, list->cur, 1);
+		list->streak = (list->streak < 0) ? -list->streak : list->streak;
+		get_next_streak(list);
+		count = ((list->streak + 1) < count) ? list->streak : count;
+		size--;
+	}
+	return (count);
 }
 
 void	skip_seq(t_env *env, t_list *list, int dir)
@@ -734,26 +775,6 @@ void	push_cells(t_env *env, t_list *dest, t_list *src, int nb)
 	}
 }
 
-int		count_cells(t_list *list)
-{
-	int		count;
-	t_elem	*tmp;
-
-	count = 0;
-	list->cur = list->first;
-	tmp = list->cur;
-	if (list->size == 0)
-		return (0);
-	get_next_streak(list);
-	count++;
-	while (list->cur != list->first)
-	{
-		get_next_streak(list);
-		count++;
-	}
-	return (count);
-}
-
 void	atob(t_env *env)
 {
 	// Partie 1 - mettre (total_cell / 5 - nombre_de_b_cells) dans b.
@@ -878,8 +899,12 @@ int main(int argc, char **argv)
 	else
 	{
 		make_lists(env);
-		make_seq(env);
-//		fix_position(env, env->a_list);
+//		make_seq(env);
+		env->a_list->cur = env->a_list->first;
+		get_next_streak(env->a_list);
+		printf("current = %i\n", env->a_list->cur->value);
+//		printf("%i\n", min_streak(env, env->a_list));
+//		fix_position(env, env->a_list, 1);
 //		skip_seq(env, env->a_list, 1);
 //		reverse_seq(env);
 //		fix_position(env, env->a_list, 1);
