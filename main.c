@@ -480,30 +480,6 @@ int		elems_left(t_list *list)
 	return (i);
 }
 
-/*void	skip_seq(t_env *env, t_list *list)
-{
-	int i;
-	int count;
-	int streak;
-
-	count = elems_left(list);
-	i = 0;
-	streak = (list->streak < 0) ? -list->streak : list->streak;
-	while (i < streak && count-- > 0)
-	{
-		if (list->dir > 0)
-		{
-			ra(env);
-			i++;
-		}
-		else
-		{
-			rra(env);
-			i++;
-		}
-	}
-}*/
-
 // On compare les value pour savoir si elles sont ordonnees. Le min d'une liste est ordonne quand il est apres le max.
 int		is_sorted(t_elem *elem1, t_elem *elem2)
 {
@@ -527,30 +503,6 @@ int		is_sorted_list(t_env *env, t_list *list)
 	}
 	return (i - env->total_numbers); // renvoie 0 si ok, renvoie autre chose si ko.
 }
-
-// Parcourt la chaine jusqu'a trouver une discontinuite dans l'ordre. Retourne le nombre de valeurs ordonnees. Positif si dans l'ordre, Negatif si inverse.
-/*int		set_streak(t_list *list, t_elem *start)
-{
-	int i;
-	int j;
-
-	j = 0;
-	i = 0;
-	while (i < list->size
-	&& is_sorted(list->cur, list->cur->next)) // && (list->cur->next->value >= list->cur->value || (list->cur->value == list->max && list->cur->next->value == list->min)))
-	{
-		list->cur = list->cur->next;
-		i++;
-	}
-	list->cur = start;
-	while (j > (list->size * -1)
-	&& !is_sorted(list->cur->next, list->cur)) // && (list->cur->next->value <= list->cur->value || (list->cur->value == list->min && list->cur->next->value == list->max)))
-	{
-		list->cur = list->cur->next;
-		j--;
-	}
-	return (i + j);
-}*/
 
 int		streak_len(t_list *list, t_elem *start)
 {
@@ -684,19 +636,6 @@ void	insert_seq(t_env *env)
 		ra(env);
 }
 
-void	reverse_seq(t_env *env)
-{
-	while (env->a_list->streak <= 2)
-	{
-		env->a_list->streak++;
-		pb(env);
-		if (env->b_list->size > 1)
-			rb(env);
-	}
-	sa(env);
-	insert_seq(env);
-}
-
 // on se place au debut de la prochaine suite de nombre.
 void	fix_position(t_env *env, t_list *list, int dir)
 {
@@ -727,6 +666,7 @@ void	push_cell(t_env *env, t_list *dest, t_list *src)
 	fix_position(env, dest, 1);
 	fix_position(env, src, 1);
 	set_streak(src, src->first, 1);
+	src->streak = (src->streak) < 0 ? -src->streak : src->streak;
 	i = 0;
 	while (i++ <= src->streak)
 	{
@@ -762,6 +702,25 @@ void	merge_cells(t_env *env, t_list *dest, t_list *src)
 			pb(env);
 		src->streak--;
 	}
+}
+
+void	reverse_seq(t_env *env)
+{
+	set_streak(env->a_list, env->a_list->first, 1);
+	env->a_list->streak = env->a_list->streak < 0 ? -env->a_list->streak : env->a_list->streak;
+	printf("%i\n", env->a_list->streak);
+	while (env->a_list->streak >= 2)
+	{
+		env->a_list->streak--;
+		pb(env);
+		if (env->b_list->size > 1)
+			rb(env);
+	}
+	sa(env);
+	ra(env);
+	ra(env);
+	push_cell(env, env->a_list, env->b_list);
+//	insert_seq(env);
 }
 
 void	push_cells(t_env *env, t_list *dest, t_list *src, int nb)
@@ -824,6 +783,49 @@ void	btoa(t_env *env)
 		merge_cells(env, env->a_list, env->b_list);
 }
 
+void	make_seq(t_env *env)
+{
+	int count;
+
+	pb(env);
+	pb(env);
+	if (!is_sorted(env->b_list->first, env->b_list->first->next))
+		sb(env);
+	pb(env);
+	if (!is_sorted(env->b_list->first, env->b_list->first->next))
+		env->b_list->first->value > env->b_list->last->value ? rb(env) : sb(env);
+	if (!is_sorted(env->a_list->first, env->a_list->first->next))
+		sa(env);
+	set_streak(env->a_list, env->a_list->first, 1);
+	count = env->a_list->streak + 1;
+	while (count > 0 && env->b_list->size > 0)
+	{
+		if (env->b_list->first->value < env->a_list->first->value)
+		{
+			pa(env);
+			count++;
+		}
+		else
+		{
+			ra(env);
+			count--;
+		}
+	}
+	while (env->b_list->size > 0)
+	{
+		if (count == 1)
+		{
+			ra(env);
+			count--;
+		}
+		else if (count == 0)
+		{
+			pa(env);
+			count++;
+		}
+	}
+}
+
 void	sorting_algorithm(t_env *env)
 {
 	fix_position(env, env->a_list, 1);
@@ -838,8 +840,8 @@ void	sorting_algorithm(t_env *env)
 			set_streak(env->a_list, env->a_list->first, env->a_list->dir); // combien d' elements d'affilee sont tries.
 			if (env->a_list->streak >= 4)                                    // si plus de 5 elements sont tries, on passe la sequence.
 				skip_seq(env, env->a_list, 1);
-////			else if (env->a_list->streak < 4 && env->a_list->streak > -4)
-////				make_seq(env);  // ATTENTION !! Besoin de check si arrive a start !
+			else if (env->a_list->streak < 4 && env->a_list->streak > -4)
+				make_seq(env);  // ATTENTION !! Besoin de check si arrive a start !
 //				env->a_list->unsorted = set_unsorted();
 			else if (env->a_list->streak <= -4)
 				reverse_seq(env);
@@ -876,10 +878,11 @@ int main(int argc, char **argv)
 	else
 	{
 		make_lists(env);
+		make_seq(env);
 //		fix_position(env, env->a_list);
-		print_lists(env);
-		skip_seq(env, env->a_list, 1);
-		print_lists(env);
+//		skip_seq(env, env->a_list, 1);
+//		reverse_seq(env);
+//		fix_position(env, env->a_list, 1);
 //		sort_list(env);
 //		atob(env);
 		write(1, "result : \n", 10);
