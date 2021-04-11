@@ -356,7 +356,7 @@ void	sa(t_env *env)
 	{
 		swap(env->a_list);
 		write(1, "sa \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -366,7 +366,7 @@ void	sb(t_env *env)
 	{
 		swap(env->b_list);
 		write(1, "sb \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -375,7 +375,7 @@ void	ss(t_env *env)
 	sa(env);
 	sb(env);
 	write(1, "ss \n", 4);
-	print_lists(env);             
+//	print_lists(env);             
 }
 
 void	ra(t_env *env)
@@ -384,7 +384,7 @@ void	ra(t_env *env)
 	{
 		roll(env->a_list, 1);
 		write(1, "ra \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -394,7 +394,7 @@ void	rb(t_env *env)
 	{
 		roll(env->b_list, 1);
 		write(1, "rb \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -406,7 +406,7 @@ void	rr(t_env *env)
 		roll(env->b_list, 1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
 		write(1, "rr \n", 4);
-	print_lists(env);
+//	print_lists(env);
 }
 
 void	rra(t_env *env)
@@ -415,7 +415,7 @@ void	rra(t_env *env)
 	{
 		roll(env->a_list, -1);
 		write(1, "rra \n", 5);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -425,7 +425,7 @@ void	rrb(t_env *env)
 	{
 		roll(env->b_list, -1);
 		write(1, "rrb \n", 5);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -437,7 +437,7 @@ void	rrr(t_env *env)
 		roll(env->b_list, -1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
 		write(1, "rrr \n", 5);
-	print_lists(env);
+//	print_lists(env);
 }
 
 void	pa(t_env *env)
@@ -448,7 +448,7 @@ void	pa(t_env *env)
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
 		write(1, "pa \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -460,7 +460,7 @@ void	pb(t_env *env)
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
 		write(1, "pb \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -796,9 +796,9 @@ void	merge_cells(t_env *env, t_list *dest, t_list *src)
 	while (dest->streak-- >= 0)
 	{
 		if (dest->id == 1)
-			ra(env);
+			rra(env);
 		else
-			rb(env);
+			rrb(env);
 	}
 }
 
@@ -823,11 +823,19 @@ void	reverse_seq(t_env *env)
 void	push_cells(t_env *env, t_list *dest, t_list *src, int nb)
 {
 	if (dest->size > 0)
+	{
 		merge_cells(env, dest, src);
+		nb--;
+	}
 	if (src->size > 0)
 	{
+		write(1, "prout\n", 6);
+		printf("--------------------\n");
+		print_lists(env);
+		write(1, "prout\n", 6);
 		while (nb-- > 0)
 			push_cell(env, dest, src);
+		printf("dest->size = %i, dest->first = %i\n", dest->size, dest->first->value);
 	}
 }
 
@@ -925,8 +933,8 @@ void	sorting_algorithm(t_env *env)
 	fix_position(env, env->a_list, 1);
 	env->a_list->start = env->a_list->first;
 	env->a_list->cur = env->a_list->start;
-	while (!(is_sorted_list(env, env->a_list) == 0 && env->a_list->size == env->total_numbers)) // true/false inverse. voir plus haut.
-	{
+//	while (!(is_sorted_list(env, env->a_list) == 0 && env->a_list->size == env->total_numbers)) // true/false inverse. voir plus haut.
+//	{
 		env->a_list->dir = 1;
 		get_next_streak(env->a_list);
 		while (min_streak(env->a_list, env->a_list->cur) < 4)
@@ -950,8 +958,7 @@ void	sorting_algorithm(t_env *env)
 //			env->a_list->cur = env->a_list->first;
 			get_next_streak(env->a_list);
 		}
-		write(1, "lol\n", 4);
-		env->a_list->dir = -1;
+/*		env->a_list->dir = -1;
 		env->b_list->dir = -1;
 		if (count_cells(env->a_list) > 1)
 		{
@@ -969,7 +976,7 @@ void	sorting_algorithm(t_env *env)
 	}
 	if (count_cells(env->b_list) > 0)
 		btoa(env);
-	fix_position(env, env->a_list, 1);
+	fix_position(env, env->a_list, 1);*/
 }
 
 //////////////////////////////////////
@@ -1013,12 +1020,14 @@ int main(int argc, char **argv)
 //		reverse_seq(env);
 //		set_streak(env->a_list, env->a_list->first, -1);
 //		printf("streak = %i\n", env->a_list->streak);
-		sort_list(env);
+//		sort_list(env);
 //		fix_position(env, env->b_list, -1);
 //		printf("sorted = %i\n", is_sorted_list(env, env->a_list));
 //		atob(env);
-//		sorting_algorithm(env);
-		merge_cells(env, env->b_list, env->a_list);
+		sorting_algorithm(env);
+		printf("cell_count = %i\n", count_cells(env->a_list));
+		atob(env);
+//		merge_cells(env, env->b_list, env->a_list);
 		write(1, "result : \n", 10);
 		print_lists(env);
 		destroy_env(env);
