@@ -136,6 +136,7 @@ void	print_lists(t_env *env)
 		{
 			ft_putnbr_fd(env->b_list->cur->value, 1);
 			env->b_list->cur = env->b_list->cur->next;
+
 		}
 		write(1, "\n", 1);
 		i++;
@@ -329,6 +330,37 @@ void    push(t_list *dest, t_list *src)
     src->last->next = tmp->next;
     tmp->next->prev = src->last;
     src->first = tmp->next;
+	if (!dest->size)
+		dest->first = tmp;
+	tmp->next = dest->first;
+    if(dest->first)
+        dest->first->prev = tmp;
+	if (!dest->size)
+		dest->last = dest->first;
+    tmp->prev = dest->last;
+    if(dest->last)
+    	dest->last->next = tmp;
+    dest->first = tmp;
+    src->size--;
+    dest->size++;
+    if (!dest->size)
+	{ 
+        dest->last = dest->first;
+        dest->last->prev = dest->first;
+        dest->last->next = dest->first;
+        dest->first->prev = dest->first;
+        dest->first->next = dest->first;
+    }
+}
+
+/*void    push(t_list *dest, t_list *src)
+{
+    t_elem *tmp;
+
+    tmp = src->first;
+    src->last->next = tmp->next;
+    tmp->next->prev = src->last;
+    src->first = tmp->next;
     tmp->next = dest->first;
     if(dest->first)
         dest->first->prev = tmp;
@@ -346,7 +378,7 @@ void    push(t_list *dest, t_list *src)
         dest->first->prev = dest->first;
         dest->first->next = dest->first;
     }
-}
+}*/
 
 void	sa(t_env *env)
 {
@@ -354,7 +386,7 @@ void	sa(t_env *env)
 	{
 		swap(env->a_list);
 		write(1, "sa \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -364,7 +396,7 @@ void	sb(t_env *env)
 	{
 		swap(env->b_list);
 		write(1, "sb \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -373,7 +405,7 @@ void	ss(t_env *env)
 	sa(env);
 	sb(env);
 	write(1, "ss \n", 4);
-	print_lists(env);             
+//	print_lists(env);             
 }
 
 void	ra(t_env *env)
@@ -392,7 +424,7 @@ void	rb(t_env *env)
 	{
 		roll(env->b_list, 1);
 		write(1, "rb \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -404,7 +436,7 @@ void	rr(t_env *env)
 		roll(env->b_list, 1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
 		write(1, "rr \n", 4);
-	print_lists(env);
+//	print_lists(env);
 }
 
 void	rra(t_env *env)
@@ -413,7 +445,7 @@ void	rra(t_env *env)
 	{
 		roll(env->a_list, -1);
 		write(1, "rra \n", 5);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -423,7 +455,7 @@ void	rrb(t_env *env)
 	{
 		roll(env->b_list, -1);
 		write(1, "rrb \n", 5);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -435,7 +467,7 @@ void	rrr(t_env *env)
 		roll(env->b_list, -1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
 		write(1, "rrr \n", 5);
-	print_lists(env);
+//	print_lists(env);
 }
 
 void	pa(t_env *env)
@@ -446,7 +478,7 @@ void	pa(t_env *env)
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
 		write(1, "pa \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -458,7 +490,7 @@ void	pb(t_env *env)
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
 		write(1, "pb \n", 4);
-		print_lists(env);
+//		print_lists(env);
 	}
 }
 
@@ -570,7 +602,6 @@ void	get_next_streak(t_list *list)
 	cmp_sign = cmp;
 	cmp = (cmp < 0) ? -cmp : cmp;
 	list->cur = tmp;
-	printf("cmp = %i\n", cmp);
 	if ((cmp_sign > 0 && list->streak > 0) || (cmp_sign < 0 && list->streak < 0))
 	{
 		while (cmp-- >= 0)
@@ -581,6 +612,40 @@ void	get_next_streak(t_list *list)
 		while (cmp-- > 0 && (list->streak > 1 || list->streak < -1))
 			list->cur = list->cur->next;
 	}
+}
+
+int		skip_streak(t_list *list)
+{
+	int count;
+
+	count = 0;
+	while (is_sorted(list->cur, list->cur->next))
+	{
+		list->cur = list->cur->next;
+		count++;
+	}
+	if (!is_sorted(list->cur, list->cur->next))
+		list->cur = list->cur->next;
+	return (count);
+}
+
+// Cette fonction renvoie la permiere serie de moins de 5. Sinon, renvoie la plus petite serie.
+int		min_streak(t_list *list, t_elem *start)
+{
+	int		ret;
+	int		cmp;
+
+	cmp = 0;
+	while (list->cur != start || cmp == 0)
+	{
+		ret = skip_streak(list);
+		if (cmp == 0)
+			cmp = ret;
+		if (ret < 4)
+			return (ret);
+		cmp = (ret < cmp) ? ret : cmp;
+	}
+	return (cmp);
 }
 
 int		count_cells(t_list *list)
@@ -601,37 +666,38 @@ int		count_cells(t_list *list)
 			list->cur = list->cur->next;
 		get_next_streak(list);
 		count++;
-		printf("count = %i, tmp = %i, list->cur = %i\n", count, tmp->value, list->cur->value);
 	}
 	count = (count == 0) ? 1 : count;
 	return (count);
 }
 
 // Cette fonction renvoie la permiere serie de moins de 5. Sinon, renvoie la plus petite serie.
-int		min_streak(t_env *env, t_list *list)
+
+int		skip_seq(t_env *env, t_list *list, int dir)
 {
-	int size;
 	int count;
 
 	(void)env;
-	list->cur = list->first;
-	get_next_streak(list);
-	count = set_streak(list, list->cur, 1) + 1;
-	size = count_cells(list);
-	printf("%i\n", size);
-	while (size > 0 && count >= 5)
+	count = 0;
+	while (is_sorted(list->first, list->first->next)) // ATTENTION !! LIRE PLUS BAS
 	{
-		list->cur = list->cur->next;
-		set_streak(list, list->cur, 1);
-		list->streak = (list->streak < 0) ? -list->streak : list->streak;
-		get_next_streak(list);
-		count = ((list->streak + 1) < count) ? list->streak : count;
-		size--;
+		if (list->id == 1)
+			dir == 1 ? ra(env) : rra(env); // ATTENTION !! NEED MODIFIER A CAUSE DE list->first->next INCOMPATIBLE avec dir = 1 !!
+		if (list->id == 2)
+			dir == 1 ? rb(env) : rrb(env);
+		count++;
+	}
+	if (!is_sorted(list->first, list->first->next))
+	{
+		if (list->id == 1)
+			dir == 1 ? ra(env) : rra(env);
+		if (list->id == 2)
+			dir == 1 ? rb(env) : rrb(env);
 	}
 	return (count);
 }
 
-void	skip_seq(t_env *env, t_list *list, int dir)
+/*void	skip_seq(t_env *env, t_list *list, int dir)
 {
 	int cmp;
 	int cmp_sign;
@@ -639,20 +705,27 @@ void	skip_seq(t_env *env, t_list *list, int dir)
 	set_streak(list, list->first, dir);
 	cmp = list->streak;
 	set_streak(list, list->first, -dir);
+	printf("streak down = %i, streak up = %i\n", cmp, list->streak);
 	cmp_sign = (cmp < 0) ? -1 : 1;     // on sauvegarde le signe de cmp.
 	cmp = (cmp < 0) ? -cmp : cmp;    // valeur absolue de cmp.
 	if ((cmp_sign > 0 && list->streak > 0) || (cmp_sign < 0 && list->streak < 0))
 	{
 		while (cmp-- >= 0) // si list->first fait partie d'une suite qui le precede, bouge jusqu'a la suivante.
+		{
 			dir < 0 ? rra(env) : ra(env);
+//			write(1, "kek\n", 4);
+		}
 	}
 	else
 	{
 		cmp += (cmp == 1) ? 0 : 1;
 		while (cmp-- > 0)
+		{
 			dir < 0 ? rra(env) : ra(env);
+			write(1, "kek\n", 4);
+		}
 	}
-}
+}*/
 
 void	insert_seq(t_env *env)
 {
@@ -751,7 +824,6 @@ void	reverse_seq(t_env *env)
 {
 	set_streak(env->a_list, env->a_list->first, 1);
 	env->a_list->streak = env->a_list->streak < 0 ? -env->a_list->streak : env->a_list->streak;
-	printf("%i\n", env->a_list->streak);
 	while (env->a_list->streak >= 2)
 	{
 		env->a_list->streak--;
@@ -854,41 +926,65 @@ void	sorting_algorithm(t_env *env)
 	fix_position(env, env->a_list, 1);
 	env->a_list->start = env->a_list->first;
 	env->a_list->cur = env->a_list->start;
-	while (!(is_sorted_list(env, env->a_list) == 0)) // true/false inverse. voir plus haut.
-	{
+//	while (!(is_sorted_list(env, env->a_list) == 0)) // true/false inverse. voir plus haut.
+//	{
 		env->a_list->dir = 1;
-		while (min_streak(env, env->a_list) < 4)
+		while (min_streak(env->a_list, env->a_list->cur) < 4)
 		{
-			fix_position(env, env->a_list, 1);
+			env->a_list->start = env->a_list->first;
+			env->a_list->cur = env->a_list->start;
 			set_streak(env->a_list, env->a_list->first, env->a_list->dir); // combien d' elements d'affilee sont tries.
+			env->a_list->cur = env->a_list->start; 
 			if (env->a_list->streak >= 4)                                    // si plus de 5 elements sont tries, on passe la sequence.
 				skip_seq(env, env->a_list, 1);
 			else if (env->a_list->streak < 4 && env->a_list->streak > -4)
+			{
 				make_seq(env);  // ATTENTION !! Besoin de check si arrive a start !
-//				env->a_list->unsorted = set_unsorted();
+				fix_position(env, env->a_list, 1);
+			}
 			else if (env->a_list->streak <= -4)
+			{
 				reverse_seq(env);
+				fix_position(env, env->a_list, 1);
+			}
+			env->a_list->cur = env->a_list->first;
+//			get_next_streak(env->a_list);
 		}
-		env->a_list->dir = -1;
-		env->b_list->dir = -1;
-		if (count_cells(env->a_list) > 1)
-			atob(env);
-		else if (count_cells(env->b_list) > 1)
-			btoa(env);
-	}
-	if (count_cells(env->b_list) > 0)
-		btoa(env);
-	fix_position(env, env->a_list, 1);
+//		env->a_list->dir = -1;
+//		env->b_list->dir = -1;
+//		if (count_cells(env->a_list) > 1)
+//			atob(env);
+//		else if (count_cells(env->b_list) > 1)
+//			btoa(env);
+//	}
+//	if (count_cells(env->b_list) > 0)
+//		btoa(env);
+//	fix_position(env, env->a_list, 1);
 }
 
 //////////////////////////////////////
 //              MAIN                //
 //////////////////////////////////////
 
-/*void	sort_list(t_env *env)
+void	sort_list(t_env *env)
 {
-	rrb(env);
-}*/
+	ra(env);
+	ra(env);
+	pb(env);
+	pb(env);
+	sb(env);
+	pb(env);
+	sb(env);
+	pa(env);
+	ra(env);
+	ra(env);
+	pa(env);
+	ra(env);
+	pa(env);
+	ra(env);
+	ra(env);
+	pb(env);
+}
 
 int main(int argc, char **argv)
 {
@@ -901,18 +997,25 @@ int main(int argc, char **argv)
 	else
 	{
 		make_lists(env);
+//		fix_position(env, env->a_list, 1);
 //		make_seq(env);
 //		env->a_list->cur = env->a_list->first;
 //		get_next_streak(env->a_list);
 //		printf("current = %i\n", env->a_list->cur->value);
-		printf("cell_count = %i\n", count_cells(env->a_list));
-//		printf("%i\n", min_streak(env, env->a_list));
+//		printf("cell_count = %i\n", count_cells(env->a_list));
+//		printf("min_streak = %i\n", min_streak(env->a_list, env->a_list->cur));
 //		fix_position(env, env->a_list, 1);
 //		skip_seq(env, env->a_list, 1);
+//		skip_seq(env, env->a_list, 1);
+//		skip_seq(env, env->a_list, 1);
+//		env->a_list->cur = env->a_list->first;
+//		get_next_streak(env->a_list);
+//		printf("current = %i\n", env->a_list->cur->value);
 //		reverse_seq(env);
 //		fix_position(env, env->a_list, 1);
 //		sort_list(env);
 //		atob(env);
+		sorting_algorithm(env);
 		write(1, "result : \n", 10);
 		print_lists(env);
 		destroy_env(env);
