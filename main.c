@@ -955,8 +955,50 @@ void	make_seq(t_env *env)
 	}
 }
 
+void	sort_small(t_env *env)
+{
+	if (env->a_list->size == 2 && 
+	!is_sorted(env->a_list->first, env->a_list->first->next))
+		sa(env);
+	if (env->a_list->size == 3)
+	{
+		if (is_sorted_list(env, env->a_list) == 0 &&
+		env->a_list->first->value != 1)
+			env->a_list->first->value == 2 ? rra(env) : ra(env);
+		else if (!(is_sorted_list(env, env->a_list) == 0))
+		{
+			if (env->a_list->first->value == 1)
+			{
+				rra(env);
+				sa(env);
+			}
+			else if (env->a_list->first->value == 3)
+			{
+				sa(env);
+				rra(env);
+			}
+			else
+				sa(env);
+		}
+	}
+}
+
+void	make_cells(t_env *env) // <-- new make_cell ?
+{
+	while (env->a_list->size > 3)
+	{
+		pb(env);
+		pb(env);
+		if (env->b_list->first->value < env->b_list->first->next->value)
+			env->a_list->first->value > env->a_list->first->next->value ? ss(env) : sb(env);
+		
+	}
+}
+
 void	sorting_algorithm(t_env *env)
 {
+	if (env->total_numbers < 5)
+		sort_small(env);
 	fix_position(env, env->a_list, 1);
 	env->a_list->start = env->a_list->first;
 	env->a_list->cur = env->a_list->start;
@@ -964,7 +1006,7 @@ void	sorting_algorithm(t_env *env)
 	{
 		env->a_list->dir = 1;
 		get_next_streak(env->a_list);
-		while (min_streak(env->a_list, env->a_list->cur) < 4)
+		while (min_streak(env->a_list, env->a_list->cur) < 4 && env->total_numbers > 4)
 		{
 //			printf("----------PART 1---------\n");
 			env->a_list->start = env->a_list->first;
@@ -1042,6 +1084,7 @@ int main(int argc, char **argv)
 //		printf("sorted = %i\n", is_sorted_list(env, env->a_list));
 //		atob(env);
 		sorting_algorithm(env);
+//		sort_small(env);
 		printf("cmd = %i\n", env->cmd);
 //		printf("cell_count = %i\n", count_cells(env->a_list));
 //		atob(env);
