@@ -10,4 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "push_swap.h"
+#include "libft.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
+int main(int argc, char **argv)
+{
+
+}

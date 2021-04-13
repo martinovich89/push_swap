@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+//#include "push_swap.h"
 #include "libft.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,15 +103,65 @@ void	ft_error(t_env *env, char *str)
 	exit(1);
 }
 
+long long int	ft_long_atoi(char *str)
+{
+	int				i;
+	long long int	result;
+	int				sign;
+
+	result = 0;
+	sign = 1;
+	i = ft_skip_space(str);
+	if (str[i] == '-')
+	{
+		sign *= -1;
+		i++;
+	}
+	else if (str[i] == '+')
+		i++;
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		result = result * 10 + str[i] - '0';
+		i++;
+	}
+	return (result * sign);
+}
+
 int		is_valid_nbr(char *str)
 {
-	size_t i;
+	size_t			i;
+	long long int	check_ovf;
 
 	i = 0;
 	while (i < ft_strlen(str))
 	{
 		if (str[i] == '-' && (i != 0 || str[i + 1] == '\0'))
 			return (0);
+		if (ft_strlen(str) > 12)
+			return (0);
+		check_ovf = ft_long_atoi(str);
+		if (check_ovf > 2147483647 || check_ovf < -2147483648)
+			return(0);
+		i++;
+	}
+	return (1);
+}
+
+int		is_valid_list(int *tab, int len)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (i < len - 1)
+	{
+		j = i + 1;
+		while (j < len)
+		{
+			if (tab[i] == tab[j])
+				return (0);
+			j++;
+		}
 		i++;
 	}
 	return (1);
@@ -119,16 +170,6 @@ int		is_valid_nbr(char *str)
 /////////////////////////////////////
 //              UTILS              //
 /////////////////////////////////////
-
-// Print one elem and go to next. To shorten print_lists().
-/*void	print_elem(t_list *list, int i)
-{
-	if (i < env->a_list->size)
-	{
-		ft_putnbr_fd(env->a_list->cur->value, 1);
-		env->a_list->cur = env->a_list->cur->next;
-	}
-}*/
 
 void	print_lists(t_env *env)
 {
@@ -247,14 +288,25 @@ void	make_lists(t_env *env)
 	env->max = env->a_list->max;
 }
 
-int		parse_args(int argc, char **argv, t_env *env)
+void	print_tab(int *tab, int len)
 {
 	int i;
 
-	if (argc < 2)
-		return (1);
-	if (!(env->numbers = ft_build_tab(argc - 1))) // 1st arg is program name ... 
-		return (2);
+	i = 0;
+	while (i < len)
+	{
+		printf("%i\n", tab[i]);
+		i++;
+	}
+}
+
+int		multi_arg(int argc, char **argv, t_env *env)
+{
+	int i;
+
+	if (env->numbers == NULL)
+		if (!(env->numbers = ft_build_tab(argc - 1))) // 1st arg is program name ... 
+			return (2);
 	i = 1;
 	while (i < argc)
 	{
@@ -269,9 +321,58 @@ int		parse_args(int argc, char **argv, t_env *env)
 	return (0);
 }
 
+int		single_arg(int argc, char **argv, t_env *env)
+{
+	(void)argc;
+	char **tab;
+	char *str;
+	char *tmp;
+
+	if (!(str = ft_strjoin(argv[0], " ")))
+		return (2);
+	tmp = str;
+	if (!(str = ft_strjoin(str, argv[1])))
+	{
+		free(tmp);
+		free(str);
+		return (2);
+	}
+	free(tmp);
+	if (!(tab = ft_split(str, ' ')))
+	{
+		free(str);
+		return (2);
+	}
+	if (multi_arg((ft_tablen(tab)), tab, env))
+		ft_error(env, "error");
+	ft_tabdel(tab);
+	free(str);
+	tab = NULL;
+	return (0);
+}
+
+int		parse_args(int argc, char **argv, t_env *env)
+{
+	if (argc < 2)
+		return (1);
+	else if (argc == 2)
+	{
+		if (single_arg(argc, argv, env))
+			ft_error(env, "error");
+	}
+	else
+	{
+		if (multi_arg(argc, argv, env))
+			ft_error(env, "error");
+	}
+	if (!is_valid_list(env->numbers, env->total_numbers))
+		ft_error(env, "error");
+	return (0);
+}
+
 void	set_env_minmax(t_env *env);
 
-void	*create_env()
+t_env	*create_env()
 {
 	t_env *env;
 
@@ -340,33 +441,6 @@ void    push(t_list *dest, t_list *src)
     }
 }
 
-/*void    push(t_list *dest, t_list *src)
-{
-    t_elem *tmp;
-
-    tmp = src->first;
-    src->last->next = tmp->next;
-    tmp->next->prev = src->last;
-    src->first = tmp->next;
-    tmp->next = dest->first;
-    if(dest->first)
-        dest->first->prev = tmp;
-    tmp->prev = dest->last;
-    if(dest->last)
-    	dest->last->next = tmp;
-    dest->first = tmp;
-    src->size--;
-    dest->size++;
-    if (!dest->last)
-	{ 
-        dest->last = dest->first;
-        dest->last->prev = dest->first;
-        dest->last->next = dest->first;
-        dest->first->prev = dest->first;
-        dest->first->next = dest->first;
-    }
-}*/
-
 void	sa(t_env *env)
 {
 	if (env->a_list->size >= 2)
@@ -405,7 +479,6 @@ void	ra(t_env *env)
 		roll(env->a_list, 1);
 		write(1, "ra \n", 4);
 		env->cmd++;
-//		printf("a_first = %i\n", env->a_list->first->value);
 //		print_lists(env);
 	}
 }
@@ -677,7 +750,7 @@ int		skip_seq(t_env *env, t_list *list, int dir)
 {
 	int count;
 
-	printf("--------SKIP SEQUENCE-------\n");
+//	printf("--------SKIP SEQUENCE-------\n");
 	(void)env;
 	count = 0;
 	while (is_sorted(list->first, list->first->next)) // ATTENTION !! LIRE PLUS BAS
@@ -955,32 +1028,50 @@ void	make_seq(t_env *env)
 	}
 }
 
+void	sort_two(t_env *env, t_list *list)
+{
+	if (!is_sorted(list->first, list->first->next))
+		sa(env);
+}
+
+void	sort_three(t_env *env, t_list *list)
+{
+	if (is_sorted_list(env, list) == 0 &&
+	list->first->value != list->min)
+		(list->first->value != list->min &&
+		list->first->value != list->max) ? rra(env) : ra(env);
+	else if (!(is_sorted_list(env, list) == 0))
+	{
+		if (list->first->value == list->min)
+		{
+			rra(env);
+			sa(env);
+		}
+		else if (list->first->value == list->max)
+		{
+			sa(env);
+			rra(env);
+		}
+		else
+			sa(env);
+	}
+}
+
+void	sort_four(t_env *env, t_list *list)
+{
+	(void)list;
+	(void)env;
+}
+
 void	sort_small(t_env *env)
 {
-	if (env->a_list->size == 2 && 
-	!is_sorted(env->a_list->first, env->a_list->first->next))
-		sa(env);
+	if (env->a_list->size == 2)
+		sort_two(env, env->a_list);
 	if (env->a_list->size == 3)
-	{
-		if (is_sorted_list(env, env->a_list) == 0 &&
-		env->a_list->first->value != 1)
-			env->a_list->first->value == 2 ? rra(env) : ra(env);
-		else if (!(is_sorted_list(env, env->a_list) == 0))
-		{
-			if (env->a_list->first->value == 1)
-			{
-				rra(env);
-				sa(env);
-			}
-			else if (env->a_list->first->value == 3)
-			{
-				sa(env);
-				rra(env);
-			}
-			else
-				sa(env);
-		}
-	}
+		sort_three(env, env->a_list);
+	if (env->a_list->size == 4)
+		sort_four(env, env->a_list);
+		
 }
 
 void	make_cells(t_env *env) // <-- new make_cell ?
@@ -991,8 +1082,9 @@ void	make_cells(t_env *env) // <-- new make_cell ?
 		pb(env);
 		if (env->b_list->first->value < env->b_list->first->next->value)
 			env->a_list->first->value > env->a_list->first->next->value ? ss(env) : sb(env);
-		
 	}
+	if (env->a_list->size == 3)
+		sort_small(env);
 }
 
 void	sorting_algorithm(t_env *env)
@@ -1055,6 +1147,10 @@ int main(int argc, char **argv)
 {
 	t_env	*env;
 
+	if (argc == 1)
+		return (0);
+	if (argc == 2 && argv[1][0] == '\0')
+		return (0);
 	if (!(env = create_env()))
 		ft_error(env, "error");
 	if (parse_args(argc, argv, env) != 0)				// can use an integer to get return value.
