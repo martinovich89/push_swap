@@ -10,12 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
+
 
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
 # include "libft.h"
+# include "get_next_line.h"
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
@@ -94,7 +95,7 @@ void			print_tab(int *tab, int len);
 int				multi_arg(int argc, char **argv, t_env *env);
 int				single_arg(int argc, char **argv, t_env *env);
 int				parse_args(int argc, char **argv, t_env *env);
-void			*create_env();
+t_env			*create_env();
 
 //////////////////////////////////////
 //          INSTRUCTIONS            //
@@ -146,4 +147,3 @@ void			sort_small(t_env *env);
 void			make_cells(t_env *env);
 void			sorting_algorithm(t_env *env);
 void			sort_list(t_env *env);
-*/

@@ -16,23 +16,38 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void	listen_input(t_env *env)
+typedef struct	s_chk
 {
-	char	*str;
-	int		i;
+	char *inst_list;
+}				t_chk;
 
-	str = NULL;
-	i = 0;
-	while (ft_strcmp(str, "end") != 0)
+void	listen_input(t_env *env, t_chk chk)
+{
+	char	*line;
+	char	*tmp;
+
+	line = NULL;
+	while (get_next_line(0, &line) > 0)
 	{
-		i++;
+		if (chk.inst_list == NULL)
+			chk.inst_list = ft_strdup(line);
+		else
+		{
+			tmp = chk.inst_list;
+			chk.inst_list = ft_strjoin(chk.inst_list, line);
+			free(tmp);
+		}
+		printf("inst = %s\n", chk.inst_list);
 		(void)env;
+		free(line);
 	}
+	free(chk.inst_list);
 }
 
 int		main(int argc, char **argv)
 {
 	t_env	*env;
+	t_chk	chk = {};
 
 	if (argc == 1)
 		return (0);
@@ -44,7 +59,8 @@ int		main(int argc, char **argv)
 		ft_error(env, "error"); // can use parse_args() return value with some error message array.
 	make_lists(env);
 
-//	listen_input(env);
+	printf("Ca marche !!!\n");
+	listen_input(env, chk);
 
     destroy_env(env);
     return (0);
