@@ -93,7 +93,7 @@ void			array_to_list(t_env *env, t_list *list);
 void			make_lists(t_env *env);
 void			print_tab(int *tab, int len);
 int				multi_arg(int argc, char **argv, t_env *env);
-int				single_arg(int argc, char **argv, t_env *env);
+int				single_arg(char **argv, t_env *env);
 int				parse_args(int argc, char **argv, t_env *env);
 t_env			*create_env();
 
@@ -120,6 +120,7 @@ void			pb(t_env *env);
 //        SORTING ALGORITHM         //
 //////////////////////////////////////
 
+int				is_valid_input_str(char *str);
 int				elems_left(t_list *list);
 int				is_sorted(t_elem *elem1, t_elem *elem2);
 int				streak_len(t_list *list, t_elem *start);

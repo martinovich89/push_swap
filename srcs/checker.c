@@ -46,21 +46,6 @@ void	destroy_chk(t_chk *chk)
 
 void	ft_chk_error(t_env *env, t_chk *chk)
 {
-/*	if (chk->cmd_list)
-	{
-		free(chk->cmd_list);
-		chk->cmd_list = NULL;
-	}
-	if (chk->tmp)
-	{
-		free(chk->tmp);
-		chk->tmp = NULL;
-	}
-	if (chk->cmd_tab)
-	{
-		free(chk->cmd_tab);
-		chk->cmd_tab = NULL;
-	}*/
 	destroy_chk(chk);
 	ft_error(env, "error");
 }
@@ -126,6 +111,8 @@ void	listen_input(t_env *env, t_chk *chk)
 		get_cmd(env, chk, line);
 	if (line)
 	{
+		if (line[0] == '\0' && chk->cmd_list == NULL)
+			chk->cmd_list = ft_strdup("");
 		free(line);
 		line = NULL;
 	}
@@ -175,10 +162,13 @@ void	make_tab(t_env *env, t_chk *chk)
 		ft_chk_error(env, chk);
 }
 
-/*void	check_sequence(t_env *env)
+void	check_sequence(t_env *env)
 {
-
-}*/
+	if (is_sorted_list(env, env->a_list) == 0 && env->a_list->size == env->total_numbers && env->a_list->first->value == env->min)
+		write(1, "OK\n", 3);
+	else
+		write(1, "KO\n", 3);
+}
 
 int		main(int argc, char **argv)
 {
@@ -190,17 +180,19 @@ int		main(int argc, char **argv)
 		return (0);
 	if (argc == 2 && argv[1][0] == '\0')
 		return (0);
+	if (argc == 2 && is_charset_str(argv[1], "- 1234567890") &&
+	!is_valid_input_str(argv[1]))
+		return (0);
 	if (!(env = create_env()))
 		ft_error(env, "error");
 	if (parse_args(argc, argv, env) != 0)
 		ft_error(env, "error");
-//	write(1, "kek\n", 4);
 	make_lists(env);
 	listen_input(env, &chk);
 	make_tab(env, &chk);
 	apply_cmd(env, &chk);
-	print_lists(env);
-//	check_sequence(env);
+//	print_lists(env);
+	check_sequence(env);
     destroy_env(env);
 	destroy_chk(&chk);
     return (0);

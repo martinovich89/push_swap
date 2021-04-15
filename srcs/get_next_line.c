@@ -42,7 +42,7 @@ t_element	*ft_getcontent(int fd, t_element **stat)
 	return (lst);
 }
 
-char	*ft_read(t_element *curr)
+char		*ft_read(t_element *curr)
 {
 	char	buf[BUFFER_SIZE + 1];
 	char	*tmp;
@@ -63,7 +63,7 @@ char	*ft_read(t_element *curr)
 	return (curr->data);
 }
 
-int		ft_cpytoline(t_element *curr, char **line)
+int			ft_cpytoline(t_element *curr, char **line)
 {
 	char	*tmp;
 	size_t	i;
@@ -77,13 +77,13 @@ int		ft_cpytoline(t_element *curr, char **line)
 		return (0);
 	j = ft_strlen(curr->data);
 	if (!(curr->data = ft_substr(curr->data, i + 1, j - (i + 1))))
-		return (0);	
+		return (0);
 	free(tmp);
 	tmp = NULL;
 	return (1);
 }
 
-void	ft_free_elem(t_element *curr, t_element **stat)
+void		ft_free_elem(t_element *curr, t_element **stat)
 {
 	t_element	*lst;
 
@@ -103,7 +103,7 @@ void	ft_free_elem(t_element *curr, t_element **stat)
 	curr = NULL;
 }
 
-int		get_next_line(int fd, char **line)
+int			get_next_line(int fd, char **line)
 {
 	static t_element	*lst;
 	t_element			*curr;
