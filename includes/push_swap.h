@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
@@ -22,11 +20,14 @@
 # include <unistd.h>
 # include <errno.h>
 
-#endif
-
-//////////////////////////////////////
-//            STRUCTURES            //
-//////////////////////////////////////
+typedef struct	s_chk
+{
+	char	**cmd_tab;
+	char	*cmd_list;
+	char	*tmp;
+	int		error;
+	int		fd;
+}				t_chk;
 
 typedef struct	s_elem
 {
@@ -37,12 +38,11 @@ typedef struct	s_elem
 
 typedef struct	s_list
 {
-	int		size;			//current list size
-	int		min;			//current list min
-	int		max;			//current list max
+	int		size;
+	int		min;
+	int		max;
 	int		streak;
 	int		dir;
-	int		unsorted;
 	int		cell_count;
 	int		id;
 	t_elem	*start;
@@ -57,34 +57,24 @@ typedef struct	s_env
 	int		min;
 	int		max;
 	int		total_numbers;
-	char	*sequence_str;
 	int		*numbers;
-	int		min_sort_seq;
 	t_list	*a_list;
 	t_list	*b_list;
 }				t_env;
 
-//////////////////////////////////////
-//           DESTRUCTION            //
-//////////////////////////////////////
-
 void			destroy_list(t_list *list);
 void			destroy_env(t_env *env);
-
-//////////////////////////////////////
-//             ERRORS               //
-//////////////////////////////////////
+void			destroy_chk(t_chk *chk);
 
 void			ft_error(t_env *env, char *str);
 long long int	ft_long_atoi(char *str);
 int				is_valid_nbr(char *str);
 int				is_valid_list(int *tab, int len);
 void			print_lists(t_env *env);
+void			ft_chk_error(t_env *env, t_chk *chk);
+void			free_and_quit(t_env *env, char **tab, char *str);
 
-//////////////////////////////////////
-//           CONTRUCTION            //
-//////////////////////////////////////
-
+void			make_tab(t_env *env, t_chk *chk);
 void			set_list_minmax(t_list *list);
 t_elem			*create_elem();
 void			set_elem(t_elem *elem, int nb, t_elem *addr1, t_elem *addr2);
@@ -96,10 +86,6 @@ int				multi_arg(int argc, char **argv, t_env *env);
 int				single_arg(char **argv, t_env *env);
 int				parse_args(int argc, char **argv, t_env *env);
 t_env			*create_env();
-
-//////////////////////////////////////
-//          INSTRUCTIONS            //
-//////////////////////////////////////
 
 void			swap(t_list *list);
 void			roll(t_list *list, int dir);
@@ -115,10 +101,6 @@ void			rrb(t_env *env);
 void			rrr(t_env *env);
 void			pa(t_env *env);
 void			pb(t_env *env);
-
-//////////////////////////////////////
-//        SORTING ALGORITHM         //
-//////////////////////////////////////
 
 int				is_valid_input_str(char *str);
 int				elems_left(t_list *list);
@@ -148,3 +130,12 @@ void			sort_small(t_env *env);
 void			make_cells(t_env *env);
 void			sorting_algorithm(t_env *env);
 void			sort_list(t_env *env);
+void			check_sequence(t_env *env);
+void			apply_cmd(t_env *env, t_chk *chk);
+int				is_valid_input(char *line);
+void			append_cmd(t_env *env, t_chk *chk, char *line);
+void			get_cmd(t_env *env, t_chk *chk, char *line);
+void			listen_input(t_env *env, t_chk *chk);
+void			pick_cmd(t_env *env, t_chk *chk, int i);
+
+#endif

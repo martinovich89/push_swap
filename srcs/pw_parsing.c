@@ -12,44 +12,11 @@
 
 #include "push_swap.h"
 
-int		is_valid_list(int *tab, int len)
+void	free_and_quit(t_env *env, char **tab, char *str)
 {
-	int i;
-	int j;
-
-	i = 0;
-	while (i < len - 1)
-	{
-		j = i + 1;
-		while (j < len)
-		{
-			if (tab[i] == tab[j])
-				return (0);
-			j++;
-		}
-		i++;
-	}
-	return (1);
-}
-
-int		is_valid_nbr(char *str)
-{
-	size_t			i;
-	long long int	check_ovf;
-
-	i = 0;
-	while (i < ft_strlen(str))
-	{
-		if (str[i] == '-' && (i != 0 || str[i + 1] == '\0'))
-			return (0);
-		if (ft_strlen(str) > 12)
-			return (0);
-		check_ovf = ft_long_atoi(str);
-		if (check_ovf > 2147483647 || check_ovf < -2147483648)
-			return (0);
-		i++;
-	}
-	return (1);
+	free(str);
+	ft_tabdel(tab);
+	ft_error(env, "Error");
 }
 
 int		multi_arg(int argc, char **argv, t_env *env)
@@ -95,48 +62,28 @@ int		single_arg(char **argv, t_env *env)
 		return (2);
 	}
 	if (multi_arg((ft_tablen(tab)), tab, env))
-	{
-		free(str);
-		ft_tabdel(tab);
-		ft_error(env, "error");
-	}
+		free_and_quit(env, tab, str);
 	ft_tabdel(tab);
 	free(str);
 	tab = NULL;
 	return (0);
 }
 
-int		is_valid_input_str(char *str)
-{
-	int i;
-	int len;
-
-	len = ft_strlen(str);
-	i = 0;
-	while (i < len)
-	{
-		if (is_in_str("0123456789", str[i]))
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
 int		parse_args(int argc, char **argv, t_env *env)
 {
 	if (argc < 2)
-		return (1);	
+		return (1);
 	else if (argc == 2)
 	{
 		if (single_arg(argv, env))
-			ft_error(env, "error");
+			ft_error(env, "Error");
 	}
 	else
 	{
 		if (multi_arg(argc, argv, env))
-			ft_error(env, "error");
+			ft_error(env, "Error");
 	}
 	if (!is_valid_list(env->numbers, env->total_numbers))
-		ft_error(env, "error");
+		ft_error(env, "Error");
 	return (0);
 }

@@ -12,6 +12,25 @@
 
 #include "push_swap.h"
 
+void	destroy_chk(t_chk *chk)
+{
+	if (chk->cmd_list)
+	{
+		free(chk->cmd_list);
+		chk->cmd_list = NULL;
+	}
+	if (chk->tmp)
+	{
+		free(chk->tmp);
+		chk->tmp = NULL;
+	}
+	if (chk->cmd_tab)
+	{
+		ft_tabdel(chk->cmd_tab);
+		chk->cmd_tab = NULL;
+	}
+}
+
 void	destroy_list(t_list *list)
 {
 	int i;
@@ -44,4 +63,10 @@ void	ft_error(t_env *env, char *str)
 	write(2, str, ft_strlen(str));
 	write(2, "\n", 1);
 	exit(1);
+}
+
+void	ft_chk_error(t_env *env, t_chk *chk)
+{
+	destroy_chk(chk);
+	ft_error(env, "Error");
 }

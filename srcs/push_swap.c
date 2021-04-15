@@ -111,9 +111,9 @@ int		main(int argc, char **argv)
 	!is_valid_input_str(argv[1]))
 		return (0);
 	if (!(env = create_env()))
-		ft_error(env, "error");
+		ft_error(env, "Error");
 	if (parse_args(argc, argv, env) != 0)
-		ft_error(env, "error");
+		ft_error(env, "Error");
 	make_lists(env);
 	sorting_algorithm(env);
 	destroy_env(env);

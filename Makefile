@@ -8,17 +8,16 @@ INC			=	-I./includes
 
 SRC_PATH	=	./srcs/
 
-#SRC			=	$(CONSTRUCTION) $(DESTRUCTION) $(ERRORS) $(SORTING ALGORITHM) $(UTILS)
-
 SRC			=	push_swap.c utils.c swap_instructions.c push_instructions.c \
 				roll_instructions.c roll_instructions2.c pw_parsing.c \
-				sort_units.c sort_sequence.c cell_utils.c adjust_pos.c \
-				streak.c streak_utils.c create.c init.c quit.c
+				pw_parsing_utils.c sort_units.c sort_sequence.c cell_utils.c \
+				adjust_pos.c streak.c streak_utils.c create.c init.c quit.c
 
-SRC_CHK		=	checker.c utils.c get_next_line.c get_next_line_utils.c \
-				get_next_line_utils2.c swap_instructions.c \
-				push_instructions.c roll_instructions.c roll_instructions2.c \
-				pw_parsing.c create.c init.c quit.c
+SRC_CHK		=	checker.c checker_utils.c utils.c get_next_line.c \
+				get_next_line_utils.c get_next_line_utils2.c \
+				swap_instructions.c push_instructions.c roll_instructions.c \
+				roll_instructions2.c pw_parsing.c pw_parsing_utils.c \
+				create.c init.c quit.c
 
 SRCS		=	$(addprefix $(SRC_PATH), $(SRC))
 
