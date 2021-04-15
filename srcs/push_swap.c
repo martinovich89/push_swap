@@ -114,7 +114,6 @@ int		main(int argc, char **argv)
 		ft_error(env, "error");
 	if (parse_args(argc, argv, env) != 0)
 		ft_error(env, "error");
-	print_lists(env);
 	make_lists(env);
 	sorting_algorithm(env);
 	destroy_env(env);
