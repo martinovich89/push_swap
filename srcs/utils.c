@@ -393,7 +393,7 @@ void	sa(t_env *env)
 	if (env->a_list->size >= 2)
 	{
 		swap(env->a_list);
-		write(1, "sa \n", 4);
+		write(1, "sa\n", 3);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -404,7 +404,7 @@ void	sb(t_env *env)
 	if (env->b_list->size >= 2)
 	{
 		swap(env->b_list);
-		write(1, "sb \n", 4);
+		write(1, "sb\n", 3);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -414,7 +414,7 @@ void	ss(t_env *env)
 {
 	sa(env);
 	sb(env);
-	write(1, "ss \n", 4);
+	write(1, "ss\n", 3);
 	env->cmd++;
 //	print_lists(env);             
 }
@@ -424,7 +424,7 @@ void	ra(t_env *env)
 	if (env->a_list->size >= 2)
 	{
 		roll(env->a_list, 1);
-		write(1, "ra \n", 4);
+		write(1, "ra\n", 3);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -435,7 +435,7 @@ void	rb(t_env *env)
 	if (env->b_list->size >= 2)
 	{
 		roll(env->b_list, 1);
-		write(1, "rb \n", 4);
+		write(1, "rb\n", 3);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -448,7 +448,7 @@ void	rr(t_env *env)
 	if (env->b_list->size >= 2)
 		roll(env->b_list, 1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
-		write(1, "rr \n", 4);
+		write(1, "rr\n", 3);
 	env->cmd++;
 //	print_lists(env);
 }
@@ -458,7 +458,7 @@ void	rra(t_env *env)
 	if (env->a_list->size >= 2)
 	{
 		roll(env->a_list, -1);
-		write(1, "rra \n", 5);
+		write(1, "rra\n", 4);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -469,7 +469,7 @@ void	rrb(t_env *env)
 	if (env->b_list->size >= 2)
 	{
 		roll(env->b_list, -1);
-		write(1, "rrb \n", 5);
+		write(1, "rrb\n", 4);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -482,7 +482,7 @@ void	rrr(t_env *env)
 	if (env->b_list->size >= 2)
 		roll(env->b_list, -1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
-		write(1, "rrr \n", 5);
+		write(1, "rrr\n", 4);
 	env->cmd++;
 //	print_lists(env);
 }
@@ -494,7 +494,7 @@ void	pa(t_env *env)
 		push(env->a_list, env->b_list);
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
-		write(1, "pa \n", 4);
+		write(1, "pa\n", 3);
 		env->cmd++;
 //		print_lists(env);
 	}
@@ -507,7 +507,7 @@ void	pb(t_env *env)
 		push(env->b_list, env->a_list);
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
-		write(1, "pb \n", 4);
+		write(1, "pb\n", 3);
 		env->cmd++;
 //		print_lists(env);
 	}

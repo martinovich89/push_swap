@@ -65,7 +65,7 @@ typedef struct	s_env
 //           DESTRUCTION            //
 //////////////////////////////////////
 
-void	destroy_list(t_list *list)
+/*void	destroy_list(t_list *list)
 {
 	int i;
 
@@ -1171,7 +1171,7 @@ void	sort_list(t_env *env)
 	pb(env);
 	pb(env);
 	pb(env);
-}
+}*/
 
 int main(int argc, char **argv)
 {
@@ -1209,12 +1209,12 @@ int main(int argc, char **argv)
 //		atob(env);
 	sorting_algorithm(env);
 //		sort_small(env);
-	printf("cmd = %i\n", env->cmd);
+//	printf("cmd = %i\n", env->cmd);
 //		printf("cell_count = %i\n", count_cells(env->a_list));
 //		atob(env);
 //		merge_cells(env, env->b_list, env->a_list);
-	write(1, "result : \n", 10);
-	print_lists(env);
+//	write(1, "result : \n", 10);
+//	print_lists(env);
 	destroy_env(env);
 
 	return (0);

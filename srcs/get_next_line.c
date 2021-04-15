@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 
 t_element	*ft_getcontent(int fd, t_element **stat)
 {
@@ -76,7 +77,7 @@ int		ft_cpytoline(t_element *curr, char **line)
 		return (0);
 	j = ft_strlen(curr->data);
 	if (!(curr->data = ft_substr(curr->data, i + 1, j - (i + 1))))
-		return (0);
+		return (0);	
 	free(tmp);
 	tmp = NULL;
 	return (1);
@@ -107,7 +108,7 @@ int		get_next_line(int fd, char **line)
 	static t_element	*lst;
 	t_element			*curr;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || !line)
+	if (gnl_args_check(lst, line, fd) == -1)
 		return (-1);
 	if (!(curr = ft_getcontent(fd, &lst)))
 		return (-1);

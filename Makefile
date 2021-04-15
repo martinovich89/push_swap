@@ -10,15 +10,16 @@ SRC_PATH	=	./srcs/
 
 #SRC			=	$(CONSTRUCTION) $(DESTRUCTION) $(ERRORS) $(SORTING ALGORITHM) $(UTILS)
 
-SRC			=	push_swap.c
+SRC			=	push_swap.c utils.c
 
-SRC_CHK		=	checker.c utils.c get_next_line.c get_next_line_utils.c
+SRC_CHK		=	checker.c utils.c get_next_line.c get_next_line_utils.c \
+				get_next_line_utils2.c
 
 SRCS		=	$(addprefix $(SRC_PATH), $(SRC))
 
 SRCS_CHK	=	$(addprefix $(SRC_PATH), $(SRC_CHK))
 
-FLAGSD		=	-Wall -Wextra -Werror -fsanitize=address -g3
+FLAGSD		=	-Wall -Wextra -Werror #-fsanitize=address -g3
 
 FLAGS		=	-Wall -Wextra -Werror
 

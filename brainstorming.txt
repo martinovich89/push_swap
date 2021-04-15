@@ -107,7 +107,12 @@ Si une suite de nombres est classee en sens inverse, il suffit de push, reverse-
 
 TRI ONE-AGAIN-A-BISTOUFLY
 
-tri cells de 5 elems.
-Puis merge les cells 2 a 2 dans b (moins de push).
-Puis merge les cells 2 a 2 dans a.
-repeter jusqu'a ce que tout soit classe.
+tri cells de 5 elems.             // <-- attention aux derniers nombres restant !!
+tri + inser des derniers elems.
+--
+puis mettre (a_total_cells / 20) cells dans b.
+merge une a une les premieres cells de A dans les cells de B.
+Recommencer jusqu'a ce que A soit vide.
+--
+puis mettre (b_total_cells / 20) cells dans a.
+merge une a une les premieres cells de B dans A.

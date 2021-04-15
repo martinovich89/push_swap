@@ -18,50 +18,190 @@
 
 typedef struct	s_chk
 {
-	char *inst_list;
+	char	**cmd_tab;
+	char	*cmd_list;
+	char	*tmp;
+	int		error;
+	int		fd;
 }				t_chk;
 
-void	listen_input(t_env *env, t_chk chk)
+void	destroy_chk(t_chk *chk)
+{
+	if (chk->cmd_list)
+	{
+		free(chk->cmd_list);
+		chk->cmd_list = NULL;
+	}
+	if (chk->tmp)
+	{
+		free(chk->tmp);
+		chk->tmp = NULL;
+	}
+	if (chk->cmd_tab)
+	{
+		ft_tabdel(chk->cmd_tab);
+		chk->cmd_tab = NULL;
+	}
+}
+
+void	ft_chk_error(t_env *env, t_chk *chk)
+{
+/*	if (chk->cmd_list)
+	{
+		free(chk->cmd_list);
+		chk->cmd_list = NULL;
+	}
+	if (chk->tmp)
+	{
+		free(chk->tmp);
+		chk->tmp = NULL;
+	}
+	if (chk->cmd_tab)
+	{
+		free(chk->cmd_tab);
+		chk->cmd_tab = NULL;
+	}*/
+	destroy_chk(chk);
+	ft_error(env, "error");
+}
+
+int		is_valid_input(char *line)
+{
+	size_t i;
+
+	i = 0;
+	if (!ft_strcmp(line, "sa") || !ft_strcmp(line, "sb") ||
+	!ft_strcmp(line, "ss") || !ft_strcmp(line, "ra") ||
+	!ft_strcmp(line, "rb") || !ft_strcmp(line, "rr") ||
+	!ft_strcmp(line, "rra") || !ft_strcmp(line, "rrb") ||
+	!ft_strcmp(line, "rrr") || !ft_strcmp(line, "pa") ||
+	!ft_strcmp(line, "pb"))
+		return (1);
+	return (0);
+}
+
+void	append_cmd(t_env *env, t_chk *chk, char *line)
+{
+	chk->tmp = chk->cmd_list;
+	if (!(chk->cmd_list = ft_strjoin(chk->cmd_list, " ")))
+		ft_chk_error(env, chk);
+	free(chk->tmp);
+	chk->tmp = NULL;
+	chk->tmp = chk->cmd_list;
+	if (!(chk->cmd_list = ft_strjoin(chk->cmd_list, line)))
+		ft_chk_error(env, chk);
+	free(chk->tmp);
+	chk->tmp = NULL;
+}
+
+void	get_cmd(t_env *env, t_chk *chk, char *line)
+{
+	chk->tmp = line;
+	if (is_valid_input(line))
+	{
+		if (chk->cmd_list == NULL)
+		{
+			if (!(chk->cmd_list = ft_strdup(line)))
+				ft_chk_error(env, chk);
+		}
+		else
+			append_cmd(env, chk, line);
+	}
+	else
+	{
+		get_next_line(-1, &line);
+		ft_chk_error(env, chk);
+	}
+	free(line);
+	line = NULL;
+	chk->tmp = NULL;
+}
+
+void	listen_input(t_env *env, t_chk *chk)
 {
 	char	*line;
-	char	*tmp;
 
 	line = NULL;
-	while (get_next_line(0, &line) > 0)
+	while (get_next_line(chk->fd, &line) > 0)
+		get_cmd(env, chk, line);
+	if (line)
 	{
-		if (chk.inst_list == NULL)
-			chk.inst_list = ft_strdup(line);
-		else
-		{
-			tmp = chk.inst_list;
-			chk.inst_list = ft_strjoin(chk.inst_list, line);
-			free(tmp);
-		}
-		printf("inst = %s\n", chk.inst_list);
-		(void)env;
 		free(line);
+		line = NULL;
 	}
-	free(chk.inst_list);
 }
+
+void	pick_cmd(t_env *env, t_chk *chk, int i)
+{
+	if (!ft_strcmp(chk->cmd_tab[i], "sa"))
+		sa(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "sb"))
+		sb(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "ss"))
+		ss(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "ra"))
+		ra(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "rb"))
+		rb(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "rr"))
+		rr(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "rra"))
+		rra(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "rrb"))
+		rrb(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "rrr"))
+		rrr(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "pa"))
+		pa(env);
+	else if (!ft_strcmp(chk->cmd_tab[i], "pb"))
+		pb(env);
+}
+
+void	apply_cmd(t_env *env, t_chk *chk)
+{
+	int i;
+
+	i = 0;
+	while (chk->cmd_tab[i])
+	{
+		pick_cmd(env, chk, i);
+		i++;
+	}
+}
+
+void	make_tab(t_env *env, t_chk *chk)
+{
+	if (!(chk->cmd_tab = ft_split(chk->cmd_list, ' ')))
+		ft_chk_error(env, chk);
+}
+
+/*void	check_sequence(t_env *env)
+{
+
+}*/
 
 int		main(int argc, char **argv)
 {
 	t_env	*env;
-	t_chk	chk = {};
-
+	t_chk	chk;
+	
+	chk = (t_chk){};
 	if (argc == 1)
 		return (0);
 	if (argc == 2 && argv[1][0] == '\0')
 		return (0);
 	if (!(env = create_env()))
 		ft_error(env, "error");
-	if (parse_args(argc, argv, env) != 0)				// can use an integer to get return value.
-		ft_error(env, "error"); // can use parse_args() return value with some error message array.
+	if (parse_args(argc, argv, env) != 0)
+		ft_error(env, "error");
+//	write(1, "kek\n", 4);
 	make_lists(env);
-
-	printf("Ca marche !!!\n");
-	listen_input(env, chk);
-
+	listen_input(env, &chk);
+	make_tab(env, &chk);
+	apply_cmd(env, &chk);
+	print_lists(env);
+//	check_sequence(env);
     destroy_env(env);
+	destroy_chk(&chk);
     return (0);
 }
