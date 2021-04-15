@@ -22,7 +22,7 @@
 
 # define BUFFER_SIZE 1
 
-int     *ft_build_tab(int nb);
+int		*ft_build_tab(int nb);
 void	ft_uint_strdel(unsigned int *str);
 int		ft_uint_tablen(unsigned int **tab);
 void	ft_uint_tabdel(unsigned int **tab);
