@@ -52,7 +52,11 @@ void	destroy_env(t_env *env)
 		destroy_list(env->a_list);
 	if (env->b_list)
 		destroy_list(env->b_list);
-	free(env->numbers);
+	if (env->numbers)
+	{
+		free(env->numbers);
+		env->numbers = NULL;
+	}
 	free(env);
 }
 

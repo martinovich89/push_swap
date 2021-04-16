@@ -58,6 +58,7 @@ typedef struct	s_env
 	int		max;
 	int		total_numbers;
 	int		*numbers;
+	int		display;
 	t_list	*a_list;
 	t_list	*b_list;
 }				t_env;

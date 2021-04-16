@@ -53,7 +53,8 @@ void	pa(t_env *env)
 		push(env->a_list, env->b_list);
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
-		write(1, "pa\n", 3);
+		if (env->display == 1)
+			write(1, "pa\n", 3);
 		env->cmd++;
 	}
 }
@@ -65,7 +66,8 @@ void	pb(t_env *env)
 		push(env->b_list, env->a_list);
 		set_list_minmax(env->a_list);
 		set_list_minmax(env->b_list);
-		write(1, "pb\n", 3);
+		if (env->display == 1)
+			write(1, "pb\n", 3);
 		env->cmd++;
 	}
 }

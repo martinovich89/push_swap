@@ -35,7 +35,7 @@ CC			=	@clang
 
 RM			=	@rm -f
 
-all:	$(NAME) $(NAME_CHK)
+all:	$(NAME_CHK) $(NAME)
 
 $(NAME):$(OBJS)
 		@make -C libft

@@ -112,6 +112,7 @@ int		main(int argc, char **argv)
 		return (0);
 	if (!(env = create_env()))
 		ft_error(env, "Error");
+	env->display = 1;
 	if (parse_args(argc, argv, env) != 0)
 		ft_error(env, "Error");
 	make_lists(env);

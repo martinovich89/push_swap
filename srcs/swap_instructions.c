@@ -26,7 +26,8 @@ void	sa(t_env *env)
 	if (env->a_list->size >= 2)
 	{
 		swap(env->a_list);
-		write(1, "sa\n", 3);
+		if (env->display == 1)
+			write(1, "sa\n", 3);
 		env->cmd++;
 	}
 }
@@ -36,7 +37,8 @@ void	sb(t_env *env)
 	if (env->b_list->size >= 2)
 	{
 		swap(env->b_list);
-		write(1, "sb\n", 3);
+		if (env->display == 1)
+			write(1, "sb\n", 3);
 		env->cmd++;
 	}
 }
@@ -45,6 +47,7 @@ void	ss(t_env *env)
 {
 	sa(env);
 	sb(env);
-	write(1, "ss\n", 3);
+	if (env->display == 1)
+		write(1, "ss\n", 3);
 	env->cmd++;
 }

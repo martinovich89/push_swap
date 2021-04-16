@@ -17,7 +17,8 @@ void	rra(t_env *env)
 	if (env->a_list->size >= 2)
 	{
 		roll(env->a_list, -1);
-		write(1, "rra\n", 4);
+		if (env->display == 1)
+			write(1, "rra\n", 4);
 		env->cmd++;
 	}
 }
@@ -27,7 +28,8 @@ void	rrb(t_env *env)
 	if (env->b_list->size >= 2)
 	{
 		roll(env->b_list, -1);
-		write(1, "rrb\n", 4);
+		if (env->display == 1)
+			write(1, "rrb\n", 4);
 		env->cmd++;
 	}
 }
@@ -39,6 +41,7 @@ void	rrr(t_env *env)
 	if (env->b_list->size >= 2)
 		roll(env->b_list, -1);
 	if (env->a_list->size >= 2 || env->b_list->size >= 2)
-		write(1, "rrr\n", 4);
+		if (env->display == 1)
+			write(1, "rrr\n", 4);
 	env->cmd++;
 }
