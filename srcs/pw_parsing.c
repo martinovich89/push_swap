@@ -73,6 +73,11 @@ int		parse_args(int argc, char **argv, t_env *env)
 {
 	if (argc < 2)
 		return (1);
+	if (argc == 2 && argv[1][0] == '\0')
+		ft_error(env, "Error");
+	else if (argc == 2 && is_charset_str(argv[1], "- 1234567890") &&
+	!is_valid_input_str(argv[1]))
+		ft_error(env, "Error");
 	else if (argc == 2)
 	{
 		if (single_arg(argv, env))

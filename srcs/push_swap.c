@@ -11,11 +11,6 @@
 /* ************************************************************************** */
 
 #include "push_swap.h"
-#include "libft.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 
 void	atob(t_env *env)
 {
@@ -104,11 +99,6 @@ int		main(int argc, char **argv)
 	t_env	*env;
 
 	if (argc == 1)
-		return (0);
-	if (argc == 2 && argv[1][0] == '\0')
-		return (0);
-	if (argc == 2 && is_charset_str(argv[1], "- 1234567890") &&
-	!is_valid_input_str(argv[1]))
 		return (0);
 	if (!(env = create_env()))
 		ft_error(env, "Error");
