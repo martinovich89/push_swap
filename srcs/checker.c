@@ -103,11 +103,6 @@ int		main(int argc, char **argv)
 	ft_bzero(&chk, sizeof(t_chk));
 	if (argc == 1)
 		return (0);
-	if (argc == 2 && argv[1][0] == '\0')
-		return (0);
-	if (argc == 2 && is_charset_str(argv[1], "- 1234567890") &&
-	!is_valid_input_str(argv[1]))
-		return (0);
 	if (!(env = create_env()))
 		ft_error(env, "Error");
 	if (parse_args(argc, argv, env) != 0)
