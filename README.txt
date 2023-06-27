@@ -3,7 +3,7 @@
 Sort a given stack with the following constraints :  
   There are 2 stacks : A and B  
   Only these operations can be performed :  
-  - swap 2 first elements of a stack  
+  - swap the 2 first elements of a stack  
   - rotate the first element to the end of a stack  
   - push the first element of a stack to the first position in the other stack
 
