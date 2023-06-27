@@ -1,6 +1,6 @@
 #PUSH_SWAP  
 
-**Sort a given stack with the following constraints :**  
+Sort a given stack with the following constraints :  
   There are 2 stacks : A and B  
   Only these operations can be performed :  
   - swap 2 first elements of a stack  
