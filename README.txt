@@ -9,7 +9,7 @@ Sort a given stack with the following constraints :
 
 My approach has been to take 5 days to think and test (with speculative standard cases) about solutions before deciding which one to use.
 I chose to use something relatively close to the merge sort. Didn't know at that time what it was called, but figured out once it was done.
-Overall, this was a very fun project to me, and I'm quite proud having succeeded with my own solution, passing 4/5 performance tests.
+Overall, this was a very fun project to me, and I'm quite proud having succeeded with my self found solution, passing 4/5 performance tests.
 
 -> To compile :  
 $> make
